@@ -10,16 +10,18 @@ Any created folders which do not ultimately contain files of its type
 will be deleted.
 
 The total count of the files moved by this script will be printed to 
-the console for convenience.
+the console for convenience.ls 
 """
 
 import glob
 import os
 import shutil
+import sys
 
 # CONSTANTS
-SRC_PATH = "/home/logank/unsorted"
-DST_PATH = "/home/logank/sorted/"
+#SRC_PATH = "/home/logank/unsorted"
+SRC_PATH = str(sys.argv[1])
+DST_PATH = str(sys.argv[2])
 
 DST_MOVIES = os.path.join(DST_PATH, "movies/")
 DST_PHOTOS = os.path.join(DST_PATH, "photos/")
@@ -27,11 +29,12 @@ DST_DOCUMENTS = os.path.join(DST_PATH, "documents/")
 DST_AUDIO = os.path.join(DST_PATH, "audio/")
 DST_APPLICATIONS = os.path.join(DST_PATH, "applications/")
 DST_MISC = os.path.join(DST_PATH, "misc/")
-DST_DIRS = [DST_MOVIES, DST_PHOTOS, DST_DOCUMENTS, DST_AUDIO]
+DST_DIRS = [DST_MOVIES, DST_PHOTOS, DST_DOCUMENTS, DST_AUDIO, DST_APPLICATIONS, DST_MISC]
 
 TOTAL_FILES = str(len(os.listdir(SRC_PATH)))
 
 
+# FIXME Check whether source path exists
 # FUNCTIONS
 def prep_dst():
     """Checks destination path for existence of destination folders;
@@ -170,8 +173,19 @@ def cleanup():
     print("---")
     print(remain_dir + " file(s) not moved.")
 
-
+def debug():
+    print("SRC_PATH = " + SRC_PATH)
+    print("DST_PATH = " + DST_PATH)
+    print("DST_MOVIES = " + DST_MOVIES)
+    print("DST_PHOTOS = " + DST_PHOTOS)
+    print("DST_AUDIO = " + DST_AUDIO)
+    print("DST_DOCUMENTS = " + DST_DOCUMENTS)
+    print("DST_APPLICATIONS = " + DST_APPLICATIONS)
+    print("DST_DIRS = " + str(DST_DIRS))
+    print("TOTAL_FILES [../unsorted] = " + TOTAL_FILES)
+    
 def main():
+    #debug()
     prep_dst()
     sort()
     cleanup()

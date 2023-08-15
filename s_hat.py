@@ -40,14 +40,19 @@ def prep_dst():
     """Checks destination path for existence of destination folders;
     creates them if necessary.
     """
-    print("Sorted " + TOTAL_FILES + " file(s):")
-    print("---")
-    for dir in DST_DIRS:
-        isExist = os.path.exists(dir)
-        if isExist == True:
-            pass
-        else:
-            os.mkdir(dir)
+    src_exist = os.path.exists(SRC_PATH)
+    if src_exist == True:
+        print("Sorted " + TOTAL_FILES + " file(s):")
+        print("---")
+        for dir in DST_DIRS:
+            isExist = os.path.exists(dir)
+            if isExist == True:
+                pass
+            else:
+                os.mkdir(dir)
+    else:
+        print("No such path exists.")
+    
 
 
 def movies():

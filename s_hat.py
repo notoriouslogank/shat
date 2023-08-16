@@ -11,6 +11,9 @@ will be deleted.
 
 The total count of the files moved by this script will be printed to 
 the console for convenience.ls 
+
+s_hat.py(src, dst)
+
 """
 
 import glob
@@ -19,7 +22,6 @@ import shutil
 import sys
 
 # CONSTANTS
-#SRC_PATH = "/home/logank/unsorted"
 SRC_PATH = str(sys.argv[1])
 DST_PATH = str(sys.argv[2])
 
@@ -29,20 +31,29 @@ DST_DOCUMENTS = os.path.join(DST_PATH, "documents/")
 DST_AUDIO = os.path.join(DST_PATH, "audio/")
 DST_APPLICATIONS = os.path.join(DST_PATH, "applications/")
 DST_MISC = os.path.join(DST_PATH, "misc/")
-DST_DIRS = [DST_MOVIES, DST_PHOTOS, DST_DOCUMENTS, DST_AUDIO, DST_APPLICATIONS, DST_MISC]
+DST_DIRS = [
+    DST_MOVIES,
+    DST_PHOTOS,
+    DST_DOCUMENTS,
+    DST_AUDIO,
+    DST_APPLICATIONS,
+    DST_MISC,
+]
 
 TOTAL_FILES = str(len(os.listdir(SRC_PATH)))
 
+USE_MISC = input("Use ../misc folder? [y/N]")
 
-# FIXME Check whether source path exists
+
 # FUNCTIONS
 def prep_dst():
     """Checks destination path for existence of destination folders;
     creates them if necessary.
     """
+    print(" ")
     src_exist = os.path.exists(SRC_PATH)
     if src_exist == True:
-        print("Sorted " + TOTAL_FILES + " file(s):")
+        print(f"Sorting {TOTAL_FILES} files in total.")
         print("---")
         for dir in DST_DIRS:
             isExist = os.path.exists(dir)
@@ -52,7 +63,6 @@ def prep_dst():
                 os.mkdir(dir)
     else:
         print("No such path exists.")
-    
 
 
 def movies():
@@ -62,7 +72,16 @@ def movies():
     dst = DST_MOVIES
 
     dst_count = 0
-    patterns = ["/*.wmv", "/*.avi", "/*.mov", "/*.flv", "/*.mkv", "/*.mp4", "/*.webm"]
+    patterns = [
+        "/*.wmv",
+        "/*.avi",
+        "/*.mov",
+        "/*.flv",
+        "/*.mkv",
+        "/*.mp4",
+        "/*.webm",
+        "/*.3gp",
+    ]
     for pattern in patterns:
         files = glob.glob(SRC_PATH + pattern)
 
@@ -70,7 +89,10 @@ def movies():
             file_name = os.path.basename(file)
             shutil.move(file, dst + file_name)
             dst_count += 1
-    print("Moved " + str(dst_count) + " file(s) to " + DST_MOVIES)
+    if dst_count > 0:
+        print(f"Moved {str(dst_count)} file(s) to {dst}")
+    else:
+        pass
 
 
 def photos():
@@ -96,7 +118,10 @@ def photos():
             file_name = os.path.basename(file)
             shutil.move(file, dst + file_name)
             dst_count += 1
-    print("Moved " + str(dst_count) + " file(s) to " + DST_PHOTOS)
+    if dst_count > 0:
+        print("Moved " + str(dst_count) + " file(s) to " + dst)
+    else:
+        pass
 
 
 def applications():
@@ -113,7 +138,10 @@ def applications():
             file_name = os.path.basename(file)
             shutil.move(file, dst + file_name)
             dst_count += 1
-    print("Moved " + str(dst_count) + " file(s) to " + DST_APPLICATIONS)
+    if dst_count > 0:
+        print("Moved " + str(dst_count) + " file(s) to " + dst)
+    else:
+        pass
 
 
 def audio():
@@ -130,7 +158,11 @@ def audio():
             file_name = os.path.basename(file)
             shutil.move(file, dst + file_name)
             dst_count += 1
-    print("Moved " + str(dst_count) + " file(s) to " + DST_AUDIO)
+            print("Moved " + str(dst_count) + " file(s) to " + DST_AUDIO)
+    if dst_count > 0:
+        print("Moved " + str(dst_count) + " file(s) to " + dst)
+    else:
+        pass
 
 
 def documents():
@@ -156,7 +188,29 @@ def documents():
             file_name = os.path.basename(file)
             shutil.move(file, dst + file_name)
             dst_count += 1
-    print("Moved " + str(dst_count) + " file(s) to " + DST_DOCUMENTS)
+    if dst_count > 0:
+        print("Moved " + str(dst_count) + " file(s) to " + dst)
+    else:
+        pass
+
+
+def misc():
+    dst_count = 0
+    if USE_MISC == "y":
+        dst = DST_MISC
+        patterns = ["/*"]
+        for pattern in patterns:
+            files = glob.glob(SRC_PATH + pattern)
+
+            for file in files:
+                file_name = os.path.basename(file)
+                shutil.move(file, dst + file_name)
+                dst_count += 1
+
+        print("Moved " + str(dst_count) + " file(s) to " + dst)
+    else:
+        remain_dir = str(len(os.listdir(SRC_PATH)))
+        print(f"{remain_dir} file(s) not moved.")
 
 
 def sort():
@@ -168,15 +222,21 @@ def sort():
     audio()
     documents()
     applications()
+    misc()
+    print("---")
 
 
 def cleanup():
     """Check whether any destination folders for contents and delete if
     empty.
     """
-    remain_dir = str(len(os.listdir(SRC_PATH)))
-    print("---")
-    print(remain_dir + " file(s) not moved.")
+    for dst in DST_DIRS:
+        size_on_disk = len(os.listdir(dst))
+        if size_on_disk <= 0:
+            os.rmdir(dst)
+        else:
+            print(f"{dst} contains {str(size_on_disk)} file(s),")
+
 
 def debug():
     print("SRC_PATH = " + SRC_PATH)
@@ -188,13 +248,15 @@ def debug():
     print("DST_APPLICATIONS = " + DST_APPLICATIONS)
     print("DST_DIRS = " + str(DST_DIRS))
     print("TOTAL_FILES [../unsorted] = " + TOTAL_FILES)
-    
+
+
 def main():
-    #debug()
+    # debug()
     prep_dst()
     sort()
     cleanup()
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
+
+# TODO: Give an option to use misc folder, delete files,
